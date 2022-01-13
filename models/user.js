@@ -32,7 +32,8 @@ module.exports = (sequelize, DataTypes) => {
           return url;
         }
 
-        return avatar;
+        const id = this.getDataValue("id");
+        return `http://${appUrl}:${appPort}/user/${id}/${avatar}` ; // devolver la nueva imagen
       }
     },
     email: DataTypes.STRING
@@ -44,8 +45,9 @@ module.exports = (sequelize, DataTypes) => {
           user.password = await encryptPass(user.password,10); // encriptar la clave antes de que inserte, usando el hook de beforeCreate
         return user;
       },
-      beforeUpdate: () => {
-        
+      beforeUpdate: () => async (user) => {
+        user.password = await encryptPass(user.password,10); // encriptar la clave antes de que inserte, usando el hook de beforeCreate
+        return user;
       }
     }
   });

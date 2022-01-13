@@ -25,8 +25,8 @@ const login = async (req,res) => {
             msg: 'Email y/o password incorrectos'
         });
 
-        delete exist.password;
-        console.log(exist)
+        delete exist.dataValues.password;
+
         const token = await genToken(exist.dataValues);
 
         res.status(200).json({
@@ -110,8 +110,52 @@ const getCurrentUser = async (req,res) => {
     }   
 }
 
+const updateUserProfile = async (req,res,next) => {
+
+    try {
+
+        let {
+            user: { id } 
+        } = req;
+
+        if(req.file) {
+            req.body.avatar = req.file.filename;
+        }
+
+        if(typeof req.body.avatar !== 'undefined' && req.body.avatar.length >  0) delete req.body.avatar;
+                        
+        const [rows,result] = await User.update(req.body,{
+            where: {
+                id
+            },
+            returning: true,
+            individualHooks: true
+        })
+
+        let newUser = result[0].get({raw: true}); // obtener el nuevo objeto
+
+        if(!newUser) {
+            return res.status(400).json({
+                msg: 'No se pudo agregar el usuario'
+            });
+        }
+
+        newUser.avatar = result[0].avatar;
+        delete newUser.password; // no enviar el password
+
+        return res.status(200).json({user:newUser});
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            error: 'Hubo un problema al actualizar el usuario'
+        })
+    }
+}
+
 module.exports = {
     login,
     register,
-    getCurrentUser
+    getCurrentUser,
+    updateUserProfile
 }

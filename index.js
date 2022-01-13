@@ -12,6 +12,8 @@ app.use(express.json());
 app.use('/',auth());
 app.use('/',index());
 app.use(express.static(__dirname +'/public')); //publicar la carpeta
+app.use(express.static(__dirname +'/uploads/')); //publicar la carpeta
+
 const PORT = appPort || 4000;
 const server = http.createServer(app);
 
