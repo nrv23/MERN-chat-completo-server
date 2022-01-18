@@ -6,8 +6,9 @@ const socketio = require("socket.io");
 const {appPort} = require("./config/app");
 const auth = require("./routes/auth");
 const index = require("./routes/index");
-const bodyParser = require("body-parser");
-const multer = require("multer");
+const chat = require("./routes/chat");
+//const bodyParser = require("body-parser");
+//const multer = require("multer");
 /**app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
@@ -22,6 +23,7 @@ app.use(cors());
 
 app.use('/',auth());
 app.use('/',index());
+app.use('/',chat());
 app.use(express.static(__dirname +'/public')); //publicar la carpeta
 app.use(express.static(__dirname +'/uploads/user')); //publicar la carpeta
 app.use(express.static(__dirname +'/uploads/chat')); //publicar la carpeta
