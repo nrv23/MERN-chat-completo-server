@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator")
 
 
 const valudateData = (req,res,next) => {
-
+    
     const errors = validationResult(req)
     if(!errors.isEmpty()){
         return res.status(400).json({
@@ -13,7 +13,8 @@ const valudateData = (req,res,next) => {
         })
     }
 
-    next();
+    console.log("pasó")
+    return next();
 }
 
 module.exports = {

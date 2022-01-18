@@ -6,6 +6,7 @@ const rulesRegister = require("../validator/auth/register");
 const rulesLogin = require("../validator/auth/login");
 const { validarJWT } = require("../middleware/validateToken");
 const rulesUser = require("../validator/user/user");
+const {imageProfile} = require("../middleware/fileUpload");
 
 
 module.exports = () => {
@@ -28,9 +29,12 @@ module.exports = () => {
     )
 
     router.put('/update-user',
-        validarJWT,
-        rulesUser,
-        valudateData,
+        [
+            validarJWT,
+            imageProfile,
+            rulesUser,
+            valudateData,
+        ],
         updateUserProfile
     )
 

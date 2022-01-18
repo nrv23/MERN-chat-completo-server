@@ -6,13 +6,25 @@ const socketio = require("socket.io");
 const {appPort} = require("./config/app");
 const auth = require("./routes/auth");
 const index = require("./routes/index");
+const bodyParser = require("body-parser");
+const multer = require("multer");
+/**app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+})); 
+app.use( bodyParser.json()); 
+ */
 
-app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+
+//app.use(multer().any()); // este middleware me permite subir archivos al servidor
+
 app.use('/',auth());
 app.use('/',index());
 app.use(express.static(__dirname +'/public')); //publicar la carpeta
-app.use(express.static(__dirname +'/uploads/')); //publicar la carpeta
+app.use(express.static(__dirname +'/uploads/user')); //publicar la carpeta
+app.use(express.static(__dirname +'/uploads/chat')); //publicar la carpeta
 
 const PORT = appPort || 4000;
 const server = http.createServer(app);

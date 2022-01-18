@@ -4,7 +4,7 @@ const { appkey } = require("../config/app");
 const validarJWT = (req, res, next) => {
   try {
     const token = req.header("Authorization");
-
+   
     if (!token) {
       return res.status(401).json({
         msg: "Sesión inválida",

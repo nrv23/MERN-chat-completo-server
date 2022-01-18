@@ -1,78 +1,49 @@
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const multer = require('multer');
+const {generate} = require("shortid")
 
-const getFileType = file => {
+const imageProfile =  async (req,res,next  ) => {
 
-    const ext = file.mimeType.split('/');
-
-    return ext[ext.length - 1];
-}
-
-const getFileName = (req,fiel, cb) => {
-
-    const ext = getFileType(file);
-
-    const filename = Date.now()+ '-'+ Math.round(Math.random() * 1E9) + '.' + ext;
-
-    cb(null,file.fieldname +'-'+ filename); // renombrar la imagen
-}
-
-const fileFilter = (req,file,cb) => {
-
-    const ext = getFileType(file);
-    const allowedType = /jpeg|jpg|png/;
-    const passed = allowedType.test(ext);
-    
-    if(passed) {
-        return cb(null, true); // pasó la imagen
-    } else {
-        return cb(null, false); // no  pasó la imagen
-
+    const configMulter = {
+        limits: {fileSize : 1000000},
+        storage: fileStorage = multer.diskStorage({
+            destination: (req,file,cb) => {
+                cb(null,__dirname+'/../uploads/user')
+            },
+            filename: (req,file,cb) => {
+                //const ext = file.mimetype.split('/')[1];
+                const ext = file.originalname.substring(file.originalname.lastIndexOf('.'),file.originalname.length);
+                cb(null,`${generate()}${ext}`)
+            }
+        })
     }
+    
+    const upload = multer(configMulter).single("avatar");
+
+    upload(req,res,async(error) => {
+        
+        if(typeof req.file === 'undefined') {
+            return next();
+        } else {
+            console.log(error);
+            if(error) {
+
+                if( error instanceof multer.MulterError) {
+
+                    if(error.code === 'LIMIT_FILE_SIZE'){
+                        return res.status(400).json({
+                            msg: 'Debe subir un archivo menos pesado'
+                        })
+                    } 
+                } else {
+                    return res.status(500).json({
+                        msg: error.message
+                    }) 
+                }
+            } else {
+                return next();
+            }
+        }   
+    })
 }
 
-const imageProfile = ( (req,res,next) => {
-
-    const storage = multer.diskStorage({
-
-        destination: (req,file,cb) => {
-
-            const { id } = req.user;
-            
-            const dest = `uploads/user/${id}`; // se crea una carpeta por cada usuario
-
-            fs.access(dest,(err) => { // saber si una carpeta existe
-
-                if(err) { // la carpeta no existe
-                    
-                    return fs.mkdir(dest, error => {
-                        if(err) return cb(error, dest)
-                    });
-
-                } else { // la carpeta si existe
-                    fs.readdir(dest, (error,files) => {
-                        if(err) throw error 
-
-                        for(const file of files) {
-
-                            fs.unlink(path.join(dest,file), error => {
-                                if(err) throw error 
-                            })
-                        }
-                    })
-
-                    return cb(null,dest); // se guardó la imagen
-                }
-            })
-        },
-        filename: getFileName,
-        fileFilter
-    })
-
-    return multer({
-        storage
-    }).single('avatar')
-})();
-
-module.exports = imageProfile;
+module.exports = { imageProfile }
