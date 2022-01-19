@@ -8,7 +8,7 @@ const {
 } = require("../models");
 
 const getChats = async (req,res) => {
-
+    console.log(req.user);
     try {
 
         const {
@@ -26,27 +26,29 @@ const getChats = async (req,res) => {
                     model: Chat,
                     include: [
                         {
-                            model:User, 
+                            model: User,
                             where: {
                                 [Op.not]: {
                                     id
                                 }
                             }
+                        },
+                        {
+                            model: Message,
+                            include: [
+                                {
+                                    model: User
+                                }
+                            ],
+                            limit: 20,
+                            order: [['id', 'DESC']]
                         }
-                    ]          
-                },
-                {
-                    model: Message,
-                    limit: 20,
-                    order: [["id","DESC"]]
-
+                    ]
                 }
             ]
-        });
+        })
 
-        return res.status(200).json({
-            messages: user.Chats
-        });
+        return res.status(200).json(user.Chats);
         
     } catch (error) {
         
@@ -128,11 +130,11 @@ const createChat = async (req,res) => {
                                     id
                                 }
                             }
+                        },
+                        {
+                            model: Message
                         }
                     ]          
-                },
-                {
-                    model: Message
                 }
             ]
         });

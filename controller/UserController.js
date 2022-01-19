@@ -66,7 +66,6 @@ const login = async (req,res) => {
 
         let obj = exist.dataValues;
         obj.img = img
-
         const token = await genToken(exist.dataValues);
 
         res.status(200).json({
