@@ -11,15 +11,9 @@ const getChats = async (req,res) => {
     console.log(req.user);
     try {
 
-        const {
-            user: {
-                id
-            }
-        } = req;
-
         const user = await User.findOne({
             where: {
-                id
+                id: req.user.id
             },
             include: [
                 {
@@ -29,7 +23,7 @@ const getChats = async (req,res) => {
                             model: User,
                             where: {
                                 [Op.not]: {
-                                    id
+                                    id: req.user.id
                                 }
                             }
                         },
@@ -48,7 +42,9 @@ const getChats = async (req,res) => {
             ]
         })
 
-        return res.status(200).json(user.Chats);
+        console.log({user});
+    
+        return res.json(user.Chats)
         
     } catch (error) {
         
@@ -165,6 +161,11 @@ const getMessagesPaginated = async (req,res) => {
             where: {
                 chatId: req.query.id
             },
+            include: [
+                {
+                    model: User
+                }
+            ],
             limit,
             offset
         });
