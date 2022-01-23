@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const cors = require("cors");
-const socketio = require("socket.io");
+const socketio = require("./socket");
 const {appPort} = require("./config/app");
 const auth = require("./routes/auth");
 const index = require("./routes/index");
@@ -32,7 +32,7 @@ const PORT = appPort || 4000;
 const server = http.createServer(app);
 
 //agregar servidor de sockets
-socketio(server,{});
+socketio(server);
 
 // servidor http corriendo
 server.listen(PORT,() => {
